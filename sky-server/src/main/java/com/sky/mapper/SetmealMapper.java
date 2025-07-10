@@ -40,5 +40,13 @@ public interface SetmealMapper {
      * 分页查询
      * @param setmealPageQueryDTO
      * @return
+     */
     Page<SetmealVO> pageQuery(SetmealPageQueryDTO setmealPageQueryDTO);
+
+    /**
+     * 根据id查询套餐
+     * @param id
+     * @return
+     */
+    Setmeal getById(Long id);
 }
