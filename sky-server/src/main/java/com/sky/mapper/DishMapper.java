@@ -59,4 +59,11 @@ public interface DishMapper {
 
     @AutoFill(value = OperationType.UPDATE)
     void update(Dish dish);
+
+    /**
+     * 根据条件查询菜品数据
+     * @param categoryId
+     * @return
+     */
+    List<DishVO> list(Integer categoryId);
 }
