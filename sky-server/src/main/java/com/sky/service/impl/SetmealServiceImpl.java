@@ -142,4 +142,21 @@ public class SetmealServiceImpl implements SetmealService {
             setmealDishMapper.insertBatch(setmealDishes);
         }
     }
+
+    /**
+     * 根据id删除套餐
+     * @param ids
+     */
+    @Override
+    public void deleteByIds(List<Long> ids) {
+        //判断套餐是否可以删除
+        for (Long id : ids) {
+            Setmeal setmeal = setmealMapper.getById(id);
+            if(setmeal.getStatus()== StatusConstant.ENABLE){
+                throw new BaseException(MessageConstant.SETMEAL_ON_SALE);
+            }
+        }
+        //删除套餐
+        setmealMapper.deleteByIds(ids);
+    }
 }
