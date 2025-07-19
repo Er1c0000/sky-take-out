@@ -62,8 +62,8 @@ public interface DishMapper {
 
     /**
      * 根据条件查询菜品数据
-     * @param categoryId
+     * @param dish
      * @return
      */
-    List<DishVO> list(Integer categoryId);
+    List<Dish> list(Dish dish);
 }

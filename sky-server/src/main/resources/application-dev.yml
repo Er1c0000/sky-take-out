@@ -9,7 +9,7 @@ sky:
   redis:
     host: localhost
     port: 6379
-    password: 7156
+    password: "7156"
     database: 0
 
   alioss:
@@ -17,3 +17,6 @@ sky:
     access-key-id: ${ALIBABA_CLOUD_ACCESS_KEY_ID}
     access-key-secret: ${ALIBABA_CLOUD_ACCESS_KEY_SECRET}
     bucket-name: sky-take-out-sqh
+  wechat:
+    appid: wxccbc795612826100
+    secret: 5b198f5b58527b2d8d010ead7043df05
