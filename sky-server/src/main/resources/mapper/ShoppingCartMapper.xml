@@ -34,4 +34,10 @@
         insert into shopping_cart (user_id, dish_id, setmeal_id, dish_flavor, number, create_time, amount, name, image)
         values (#{userId}, #{dishId}, #{setmealId}, #{dishFlavor}, #{number}, #{createTime}, #{amount}, #{name}, #{image})
     </insert>
+
+    <!--    删除购物车数据-->
+    <delete id="deleteByUserId">
+        delete from shopping_cart
+        where user_id = #{userId}
+    </delete>
 </mapper>
