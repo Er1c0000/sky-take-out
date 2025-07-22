@@ -50,7 +50,6 @@ public class AddressBookServiceImpl implements AddressBookService {
 
     /**
      * 根据id修改地址
-     *
      * @param addressBook
      */
     public void update(AddressBook addressBook) {
@@ -59,7 +58,6 @@ public class AddressBookServiceImpl implements AddressBookService {
 
     /**
      * 设置默认地址
-     *
      * @param addressBook
      */
     @Transactional
