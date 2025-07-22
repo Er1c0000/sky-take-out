@@ -36,6 +36,7 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
      * @return
      */
     @Override
+
     public void addShoppingCart(ShoppingCartDTO shoppingCartDTO) {
         //判断当前商品是否存在，存在则数量加一，不存在则添加到购物车
         ShoppingCart shoppingCart = new ShoppingCart();
@@ -97,6 +98,38 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
         Long userId = BaseContext.getCurrentId();
         shoppingCartMapper.deleteByUserId(userId);
     }
+
+
+    /**
+     * 删除或减少购物车中的商品
+     * @param shoppingCartDTO
+     * @return
+     */
+    @Override
+    public void subShoppingCart(ShoppingCartDTO shoppingCartDTO) {
+        //判断商品数量，如果商品数量大于1，则将数量-1。如果商品数量等于1，则将该商品从购物车中删除
+        ShoppingCart shoppingCart = new ShoppingCart();
+        BeanUtils.copyProperties(shoppingCartDTO, shoppingCart);
+        Long currentId = BaseContext.getCurrentId();
+        shoppingCart.setUserId(currentId);
+
+        List<ShoppingCart> list = shoppingCartMapper.list(shoppingCart);
+
+        if(list != null || list.size() > 0){
+            ShoppingCart cart = list.get(0);
+
+            if(cart.getNumber() == 1){
+                //数量等于1，则将该商品从购物车中删除
+                shoppingCartMapper.deleteById(cart.getId());
+            } else {
+                //数量大于1，则数量-1
+                cart.setNumber(cart.getNumber() - 1);
+                shoppingCartMapper.updateNumberById(cart);
+            }
+        }
+
+    }
+
 
 
 }

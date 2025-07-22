@@ -40,4 +40,9 @@
         delete from shopping_cart
         where user_id = #{userId}
     </delete>
+
+    <!-- 根据id删除购物车数据 -->
+    <delete id="deleteById">
+        delete from shopping_cart where id = #{id}
+    </delete>
 </mapper>
