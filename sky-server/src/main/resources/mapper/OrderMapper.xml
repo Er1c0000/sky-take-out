@@ -10,4 +10,29 @@
                 #{payMethod}, #{payStatus}, #{amount}, #{remark}, #{phone}, #{address}, #{consignee},
                 #{estimatedDeliveryTime}, #{deliveryStatus}, #{packAmount}, #{tablewareNumber}, #{tablewareStatus})
     </insert>
+
+    <!--    分页查询-->
+    <select id="pageQuery" resultType="com.sky.vo.OrderVO">
+        select * from orders
+        <where>
+            <if test="status != null and status != ''">
+                and status = #{status}
+            </if>
+        </where>
+        order by order_time desc
+    </select>
+
+    <!--    根据id查询-->
+    <select id="getById" resultType="com.sky.vo.OrderVO">
+        select * from orders
+        where id = #{id}
+    </select>
+
+    <!--    更新订单状态-->
+    <update id="update">
+        update orders
+        set status = #{status},
+            cancel_time = #{cancelTime}
+        where id = #{id}
+    </update>
 </mapper>

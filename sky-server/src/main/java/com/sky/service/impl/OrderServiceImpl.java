@@ -1,7 +1,10 @@
 package com.sky.service.impl;
 
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
 import com.sky.constant.MessageConstant;
 import com.sky.context.BaseContext;
+import com.sky.dto.OrdersPageQueryDTO;
 import com.sky.dto.OrdersSubmitDTO;
 import com.sky.entity.AddressBook;
 import com.sky.entity.OrderDetail;
@@ -12,8 +15,10 @@ import com.sky.mapper.AddressBookMapper;
 import com.sky.mapper.OrderDetailMapper;
 import com.sky.mapper.OrderMapper;
 import com.sky.mapper.ShoppingCartMapper;
+import com.sky.result.PageResult;
 import com.sky.service.OrderService;
 import com.sky.vo.OrderSubmitVO;
+import com.sky.vo.OrderVO;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -22,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class OrderServiceImpl implements OrderService {
@@ -96,6 +102,102 @@ public class OrderServiceImpl implements OrderService {
                 .build();
 
         return orderSubmitVO;
+
+    }
+
+    /**
+     * 历史订单查询
+     * @return
+     */
+    @Override
+    public PageResult history(OrdersPageQueryDTO ordersPageQueryDTO) {
+        PageHelper.startPage(ordersPageQueryDTO.getPage(), ordersPageQueryDTO.getPageSize());
+        // 设置当前用户ID
+        Long userId = BaseContext.getCurrentId();
+        ordersPageQueryDTO.setUserId(userId);
+        // 执行分页查询
+        Page<OrderVO> page = orderMapper.pageQuery(ordersPageQueryDTO);
+        // 封装分页结果
+        PageResult pageResult = new PageResult(page.getTotal(), page.getResult());
+        // 设置订单明细
+        for (OrderVO orderVO : page.getResult()) {
+            orderVO.setOrderDetailList(orderDetailMapper.listByOrderId(orderVO.getId()));
+        }
+
+        return pageResult;
+
+    }
+
+    /**
+     * 订单详情查询
+     * @param orderId
+     * @return
+     */
+    @Override
+    public OrderVO getOrderDetail(Long orderId) {
+        // 查询订单信息
+        OrderVO orderVO = orderMapper.getById(orderId);
+
+        // 查询订单明细
+        List<OrderDetail> orderDetailList = orderDetailMapper.listByOrderId(orderId);
+        orderVO.setOrderDetailList(orderDetailList);
+        return orderVO;
+    }
+
+
+    /**
+     * 取消订单
+     * @param id
+     */
+    @Override
+    public void cancelOrder(Long id) {
+        // 查询订单信息
+        Orders order = orderMapper.getById(id);
+        if (order == null) {
+            throw new AddressBookBusinessException(MessageConstant.ORDER_NOT_FOUND);
+        }
+
+        // 更新订单状态为已取消
+        order.setStatus(Orders.CANCELLED);
+        order.setCancelTime(LocalDateTime.now());
+        orderMapper.update(order);
+
+    }
+
+    /**
+     * 再来一单
+     * @param id
+     */
+    @Override
+    public void repeatOrder(Long id) {
+        // 查询订单信息
+        Orders order = orderMapper.getById(id);
+        if (order == null) {
+            throw new AddressBookBusinessException(MessageConstant.ORDER_NOT_FOUND);
+        }
+
+        // 查询订单明细
+        List<OrderDetail> orderDetailList = orderDetailMapper.listByOrderId(id);
+        if (orderDetailList == null || orderDetailList.isEmpty()) {
+            throw new AddressBookBusinessException(MessageConstant.ORDER_STATUS_ERROR);
+        }
+
+        Long userId = BaseContext.getCurrentId();
+
+        List<ShoppingCart> shoppingCartList = orderDetailList.stream()
+                .map(orderDetail -> ShoppingCart.builder()
+                        .userId(userId)
+                        .dishId(orderDetail.getDishId())
+                        .setmealId(orderDetail.getSetmealId())
+                        .number(orderDetail.getNumber())
+                        .amount(orderDetail.getAmount())
+                        .name(orderDetail.getName())
+                        .image(orderDetail.getImage())
+                        .build())
+                .collect(Collectors.toList());
+
+        shoppingCartMapper.insertBatch(shoppingCartList);
+
 
     }
 }

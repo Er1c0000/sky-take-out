@@ -45,4 +45,13 @@
     <delete id="deleteById">
         delete from shopping_cart where id = #{id}
     </delete>
+
+    <insert id="insertBatch">
+        INSERT INTO shopping_cart (user_id, dish_id, setmeal_id, number, amount, name, image)
+        VALUES
+        <foreach collection="shoppingCartList" item="cart" separator=",">
+            (#{cart.userId}, #{cart.dishId}, #{cart.setmealId}, #{cart.number}, #{cart.amount}, #{cart.name}, #{cart.image})
+        </foreach>
+    </insert>
+
 </mapper>
